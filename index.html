@@ -4,94 +4,81 @@
 <meta charset="UTF-8">
 <title>tt.fsp — Tomatonator Thrower</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
 <link rel="icon" href="icon.png">
 
 <style>
-  *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    user-select:none;
-    -webkit-user-select:none;
-    touch-action:none;
-  }
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+}
 
-  body{
-    background:#7F7F7F;
-    font-family: Arial, Helvetica, sans-serif;
-    overflow:hidden;
-  }
+body{
+  background:#7F7F7F;
+  font-family:Arial, Helvetica, sans-serif;
+  overflow:hidden;
+}
 
-  /* TOP BAR */
-  .topbar{
-    height:48px;
-    background:#8A8A8A;
-    display:flex;
-    align-items:center;
-    padding:0 12px;
-    gap:16px;
-  }
+/* TOP BAR */
+.topbar{
+  height:48px;
+  background:#8A8A8A;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:0 12px;
+}
 
-  .topbar img{
-    height:28px;
-  }
+.topbar img{
+  height:28px;
+}
 
-  .nav{
-    display:flex;
-    gap:14px;
-  }
+.nav span{
+  cursor:pointer;
+  font-size:14px;
+}
 
-  .nav span{
-    cursor:pointer;
-    font-size:14px;
-  }
+/* CONTENT */
+.content{
+  position:relative;
+  width:100vw;
+  height:calc(100vh - 48px);
+}
 
-  /* CONTENT */
-  .content{
-    position:relative;
-    width:100vw;
-    height:calc(100vh - 48px);
-    overflow:hidden;
-  }
+.mode{
+  position:absolute;
+  inset:0;
+  display:none;
+}
 
-  .mode{
-    position:absolute;
-    inset:0;
-    display:none;
-  }
+.mode.active{
+  display:block;
+}
 
-  .mode.active{
-    display:block;
-  }
+/* VISUAL */
+#template{
+  position:absolute;
+  inset:0;
+  background:url("template.png") center no-repeat;
+  background-size:320px auto;
+  opacity:0.6;
+  pointer-events:none;
+}
 
-  /* VISUAL MODE */
-  #visual{
-    background-color:#7F7F7F;
-  }
+.tomato{
+  position:absolute;
+  width:220px; /* BEM MAIOR */
+  pointer-events:none;
+}
 
-  #template{
-    position:absolute;
-    inset:0;
-    background-image:url("template.png");
-    background-repeat:no-repeat;
-    background-position:center;
-    background-size:300px auto;
-    pointer-events:none;
-    opacity:0.6;
-  }
-
-  .tomato{
-    position:absolute;
-    width:96px;
-    pointer-events:none;
-  }
-
-  /* EDITOR / ABOUT */
-  .panel{
-    padding:16px;
-    font-size:14px;
-  }
+/* PANELS */
+.panel{
+  padding:16px;
+  font-size:14px;
+}
 </style>
 </head>
 
@@ -113,76 +100,82 @@
   </div>
 
   <div id="editor" class="mode panel">
-    <p><b>Editor</b></p>
-    <p>BGM only plays here.</p>
+    <b>Editor</b><br>
+    BGM allowed here.
   </div>
 
   <div id="about" class="mode panel">
-    <p><b>tt.fsp — Fire Source Project</b></p><br>
-    <p><b>what's is this for?</b><br>
-    it's an web html where it makes the "Tomato Throw meme" easier to recreate ig.</p><br>
+    <b>tt.fsp — Fire Source Project</b><br><br>
 
-    <p><b>why did u make this html?</b><br>
-    just for fun.</p><br>
+    <b>what's is this for?</b><br>
+    it's an web html where it makes the "Tomato Throw meme" easier to recreate ig.<br><br>
 
-    <p><b>what's fsp?</b><br>
-    fsp stands for Fire-Source-Project.</p>
+    <b>why did u make this html?</b><br>
+    just for fun.<br><br>
+
+    <b>what's fsp?</b><br>
+    fsp stands for Fire-Source-Project.
   </div>
 
 </div>
 
-<audio id="splash" src="splash.ogg"></audio>
 <audio id="bgm" src="bgm.ogg" loop></audio>
 
 <script>
-  const modes = document.querySelectorAll(".mode");
-  const nav = document.querySelectorAll(".nav span");
-  const visual = document.getElementById("visual");
-  const splash = document.getElementById("splash");
-  const bgm = document.getElementById("bgm");
+const modes = document.querySelectorAll(".mode");
+const visual = document.getElementById("visual");
+const bgm = document.getElementById("bgm");
 
-  function setMode(name){
-    modes.forEach(m => m.classList.remove("active"));
-    document.getElementById(name).classList.add("active");
+function setMode(name){
+  modes.forEach(m => m.classList.remove("active"));
+  document.getElementById(name).classList.add("active");
 
-    document.querySelectorAll(".tomato").forEach(t => t.remove());
+  document.querySelectorAll(".tomato").forEach(t => t.remove());
 
-    if(name === "editor"){
-      bgm.play().catch(()=>{});
-    }else{
-      bgm.pause();
-      bgm.currentTime = 0;
-    }
+  if(name === "editor" || name === "about"){
+    bgm.play().catch(()=>{});
+  }else{
+    bgm.pause();
+    bgm.currentTime = 0;
   }
+}
 
-  nav.forEach(btn=>{
-    btn.onclick = ()=> setMode(btn.dataset.mode);
-  });
+document.querySelectorAll(".nav span").forEach(btn=>{
+  btn.onclick = ()=> setMode(btn.dataset.mode);
+});
 
-  function spawnTomato(x,y){
-    const img = document.createElement("img");
-    img.src = "tomato.gif";
-    img.className = "tomato";
-    img.style.left = (x - 48) + "px";
-    img.style.top = (y - 48) + "px";
-    visual.appendChild(img);
+function playSplash(){
+  const s = new Audio("splash.ogg");
+  s.play().catch(()=>{});
+}
 
-    setTimeout(()=>{
-      splash.currentTime = 0;
-      splash.play().catch(()=>{});
-    }, 900);
-  }
+function spawnTomato(x,y){
+  const img = document.createElement("img");
+  img.src = "tomato.gif";
+  img.className = "tomato";
+  img.style.left = (x - 110) + "px";
+  img.style.top  = (y - 110) + "px";
+  visual.appendChild(img);
 
-  visual.addEventListener("pointerdown", e=>{
+  /* FREEZE NO ÚLTIMO FRAME */
+  setTimeout(()=>{
+    const src = img.src;
+    img.src = "";
+    img.src = src;
+    playSplash();
+  }, 900);
+}
+
+visual.addEventListener("pointerdown", e=>{
+  spawnTomato(e.clientX, e.clientY);
+});
+
+visual.addEventListener("pointermove", e=>{
+  if(e.buttons){
     spawnTomato(e.clientX, e.clientY);
-  });
-
-  visual.addEventListener("pointermove", e=>{
-    if(e.buttons){
-      spawnTomato(e.clientX, e.clientY);
-    }
-  });
+  }
+});
 </script>
 
 </body>
-  </html>
+</html>
